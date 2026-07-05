@@ -10,6 +10,7 @@ export const signup = async (formData) => {
     const response = await api.post("/auth/register", formData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Signup failed");
+    // Attach the original error as the cause for better diagnostics
+    throw new Error(error.response?.data?.message || "Signup failed", { cause: error });
   }
 };
