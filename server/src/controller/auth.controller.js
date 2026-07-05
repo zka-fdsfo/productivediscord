@@ -51,7 +51,6 @@ export const register = async (req, res) => {
       { expiresIn: config.JWT_EXPIRE || "1d" }, // Security ke liye expiry lagana zaroori hai
     );
 
-  
     
     res.status(201).cookie("token", token).json({
       success: true,
