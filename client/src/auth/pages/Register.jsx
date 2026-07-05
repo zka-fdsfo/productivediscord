@@ -16,7 +16,9 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      await handleSignup(formData.username, formData.email, formData.password);
+
+      handleSignup(formData)
+
       setFormData({
         username: '',
         email: '',
