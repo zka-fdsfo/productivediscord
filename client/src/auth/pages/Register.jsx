@@ -1,5 +1,5 @@
 import { useState } from "react"
-
+import { handleSignup } from "../hook/auth.hook.js"
 const Register = () => {
     const [formData, setFormData] = useState({
       username: '',
@@ -10,8 +10,15 @@ const Register = () => {
       const { value, name } = e.target;
       setFormData({formData, [name]: value})
     }
-    const handleSubmit = () => {
-      
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      await handleSignup(formData.username, formData.email, formData.password);
+      setFormData({
+        username: '',
+        email: '',
+        password: ''
+      })
     }
   return ( 
     <div>
