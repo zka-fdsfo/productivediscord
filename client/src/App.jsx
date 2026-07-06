@@ -1,17 +1,16 @@
-import { Routes, Route } from 'react-router-dom'
-import { RouterProvider } from "react-router";
+import { RouterProvider } from 'react-router-dom'
 import Login from './auth/pages/Login'
 import Register from './auth/pages/Register'
 import Home from './auth/pages/Home'
-import AuthContext from './auth/auth.context'
+import { AuthProvider } from './auth/auth.context'
 
 import { router } from './app.routes'
 
 const App = () => {
   return (
-    <AuthContext>
+    <AuthProvider>
       <RouterProvider router={router} />
-    </AuthContext>
+    </AuthProvider>
   )
 }
 

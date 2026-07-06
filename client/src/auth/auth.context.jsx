@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, createContext } from 'react'
 
-const AuthContext = ({ children }) => {
+// 1. Create the actual Context object outside the component
+export const AuthContext = createContext(null);
+
+// 2. Rename the component to AuthProvider so it doesn't conflict
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-
     const [loading, setLoading] = useState(true);
-
     const [authReady, setAuthReady] = useState(false);
 
     const value = useMemo(() => ({
@@ -14,11 +16,14 @@ const AuthContext = ({ children }) => {
         setLoading,
         authReady,
     }), [user, loading, authReady]);
+
     return (
+        // 3. Use the Context object's Provider here
         <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )
 }
 
-export default AuthContext
+// 4. Export the provider as default (or keep it as a named export)
+export default AuthProvider;
