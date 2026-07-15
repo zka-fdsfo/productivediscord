@@ -5,6 +5,10 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         required: [true, "Refresh Token is required."]
     },
+    userId : {
+        type: mongoose.Schema.ObjectId,
+        ref : "User",
+        required : true   },
     verify: {
         type: Boolean,
         required: true,

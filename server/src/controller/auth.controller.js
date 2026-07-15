@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import cookies from "cookie-parser";
 import config from "../config/config.js"; // Aapki config file
 import { signAccessToken, signRefreshToken } from "../lib/jwt.js";
+import { clearAuthCookies, setAuthCookies } from "../lib/cookies.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -48,24 +49,17 @@ export const register = async (req, res) => {
     const refreshToken = signRefreshToken(payload);
 
     const session = await Session.create({
+      userId: user._id,
       refreshToken,
       verify: true,
       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
 
     // * accessToken generated
-    const accessToken = signAccessToken(payload); 
+    const accessToken = signAccessToken(payload);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 15 * 60 * 1000, // 15min
-    });
+    setAuthCookies(res, accessToken, refreshToken);
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30day
-    });
-    
     res.status(201).json({
       success: true,
       message: "User register successfully",
@@ -94,7 +88,7 @@ export const login = async (req, res) => {
     // * check user exist or not
     const existUser = await User.findOne({
       email,
-    });
+    }).select("+password");
 
     // * if user not exists
     if (!existUser) {
@@ -112,6 +106,32 @@ export const login = async (req, res) => {
         message: "Wrong Credentials",
       });
     }
+
+    const payload = {
+      id: existUser._id,
+    };
+
+    const refreshToken = signRefreshToken(payload);
+
+    await Session.deleteOne({ userId: existUser._id });
+
+    const session = await Session.create({
+      userId: existUser._id,
+      refreshToken,
+      verify: true,
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
+
+    // * accessToken generated
+    const accessToken = signAccessToken(payload);
+
+    setAuthCookies(res, accessToken, refreshToken);
+
+    res.status(200).json({
+      success: true,
+      message: "User Logged In",
+      payload,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -121,4 +141,12 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = async (req, res) => {};
+export const logout = async (req, res) => {
+  await Session.deleteOne({ userId: req.user.id });
+  clearAuthCookies(res);
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged Out Successfully.",
+  });
+};
