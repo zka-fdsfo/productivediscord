@@ -52,16 +52,25 @@ export const register = async (req, res) => {
       verify: true,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
-    
-    // * accessToken generated
-    const accessToken = signAccessToken(payload)
 
-    res.status(201).cookie("token", token).json({
+    // * accessToken generated
+    const accessToken = signAccessToken(payload);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+    });
+    
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+    });
+
+    res.status(201).json({
       success: true,
       message: "User register successfully",
       payload,
       token,
     });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
