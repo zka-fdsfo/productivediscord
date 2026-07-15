@@ -1,10 +1,10 @@
 import { User } from "../model/auth.model.js";
-
+import { Session } from "../model/session.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookies from "cookie-parser";
 import config from "../config/config.js"; // Aapki config file
-
+import { signAccessToken, signRefreshToken } from "../lib/jwt.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
       email,
     });
 
-    // * if user not exists
+    // * if user exists
     if (existUser) {
       return res.status(409).json({
         success: false,
@@ -33,7 +33,7 @@ export const register = async (req, res) => {
 
     const hashPass = await bcrypt.hash(password, 10);
 
-    // * ceating new user
+    // * creating new user
     const user = await User.create({
       username,
       email,
@@ -44,14 +44,18 @@ export const register = async (req, res) => {
       id: user._id,
     };
 
-    // * token generated
-    const token = jwt.sign(
-      payload,
-      config.JWT_SECRET,
-      { expiresIn: config.JWT_EXPIRE || "1d" }, // Security ke liye expiry lagana zaroori hai
-    );
+    // refreshToken generated
+    const refreshToken = signRefreshToken(payload);
 
+    const session = await Session.create({
+      refreshToken,
+      verify: true,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
     
+    // * accessToken generated
+    const accessToken = signAccessToken(payload)
+
     res.status(201).cookie("token", token).json({
       success: true,
       message: "User register successfully",
@@ -60,7 +64,6 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-
     res.status(500).json({
       success: false,
       message: "internal server error",
@@ -69,9 +72,44 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "all Field is required",
+      });
+    }
+
+    // * check user exist or not
+    const existUser = await User.findOne({
+      email,
+    });
+
+    // * if user not exists
+    if (!existUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User not exists",
+      });
+    }
+
+    const isRightPassword = await bcrypt.compare(password, existUser.password);
+
+    if (!isRightPassword) {
+      return res.status(401).json({
+        success: false,
+        message: "Wrong Credentials",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "internal server error",
+    });
+  }
 };
-
-
 
 export const logout = async (req, res) => {};
