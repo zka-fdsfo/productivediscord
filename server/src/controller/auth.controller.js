@@ -44,6 +44,8 @@ export const register = async (req, res) => {
 
     const payload = {
       id: user._id,
+      name: user.username,
+      email: user.email,
     };
 
     // refreshToken generated
@@ -110,6 +112,9 @@ export const login = async (req, res) => {
 
     const payload = {
       id: existUser._id,
+      name: existUser.username,
+      email: existUser.email,
+
     };
 
     const refreshToken = signRefreshToken(payload);
