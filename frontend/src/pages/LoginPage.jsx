@@ -3,16 +3,16 @@ import { useLogin } from "../hooks/useAuth";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/auth.context.jsx";
 import { FaUserCircle } from "react-icons/fa";
-
+import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-
+const navigate = useNavigate();
   const loginMutation = useLogin();
-  const { login } = useContext(AuthContext);
+
   const [loginError, setLoginError] = useState("");
 
   const onSubmit = (formData) => {
@@ -20,8 +20,7 @@ const LoginPage = () => {
 
     loginMutation.mutate(formData, {
       onSuccess: ({ data }) => {
-        login(data.payload);
-        console.log("User logged in:", data.payload);
+      navigate("/");
       },
       onError: (err) => {
         console.log(err);

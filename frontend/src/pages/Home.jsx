@@ -4,10 +4,11 @@ import { useContext } from 'react'
 import { AuthContext} from '../context/auth.context.jsx'
 
 function Home() {
-  const { user } = useContext(AuthContext);
+  const { User } = useContext(AuthContext);
+  console.log("User in Home component:", User);
   return (
     <div>
-      <h1>Welcome, {user}!</h1>
+      <h1>Welcome, {User?.name}!</h1>
     </div>
   )
 }

@@ -8,25 +8,20 @@ import {
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const isAuthenticated = !!user;
+    const [User, setUser] = useState(null);
+  
 
-    const login = (user) => {
-        setUser(user);
-    }
-
-    const logout = () => {
-        setUser(null)
-    }
-
+    
+useEffect(() => {
+    console.log("Context User Updated:", User);
+}, [User]);
     const value = useMemo(
         () => ({
-            user,
-            isAuthenticated,
-            login,
-            logout
+            User,
+            setUser,
+          
         }),
-        [user]
+        [User]
     );
     return (
         <AuthContext.Provider value={value}>

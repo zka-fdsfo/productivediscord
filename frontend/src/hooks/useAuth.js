@@ -19,14 +19,46 @@ import { AuthContext } from "../context/auth.context.jsx";
 
 // return { user, handleLogin };
 
+
 export function useLogin() {
+
+    const { User, setUser } = useContext(AuthContext);
     return useMutation({
-        mutationFn: login
+        mutationFn: login,
+        onSuccess: (data) => {
+            const userData = data?.data?.payloadtofrontend;
+            // Handle successful login, e.g., update context or local storage
+            // console.log("Login successful:", data);
+            setUser(userData);
+
+            // console.log("User set in context:", userData);
+            // console.log("User set in context:", User);
+        },
+        onError: (error) => {
+            // Handle login error, e.g., show error message
+            console.error("Login failed:", error);
+        }
     })
 }
 
 export function useRegister() {
+
+    const { User, setUser } = useContext(AuthContext);
     return useMutation({
-        mutationFn: register
+        mutationFn: register,
+        onSuccess: (data) => {
+            const userData = data?.data?.payloadtofrontend;
+            // Handle successful login, e.g., update context or local storage
+            // console.log("Login successful:", data);
+            setUser(userData);
+
+            // console.log("User set in context:", userData);
+            // console.log("User set in context:", User);
+        },
+        onError: (error) => {
+            // Handle login error, e.g., show error message
+            console.error("Login failed:", error);
+        }
     })
+
 }

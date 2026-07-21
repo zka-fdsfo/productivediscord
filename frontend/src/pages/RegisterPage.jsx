@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useRegister } from "../hooks/useAuth.js";
-import { AuthContext } from "../context/auth.context.jsx";
+
 
 // Calculates a simple password strength score based on length and character variety
 const getPasswordStrength = (password) => {
@@ -40,7 +40,7 @@ const RegisterPage = () => {
   } = useForm();
 
   const registerMutation = useRegister();
-  const { login } = useContext(AuthContext);
+
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -64,7 +64,6 @@ const RegisterPage = () => {
   const onSubmit = (data) => {
     registerMutation.mutate(data, {
       onSuccess: ({ data }) => {
-        login(data.payload);
         reset();
       },
     });
