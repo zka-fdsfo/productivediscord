@@ -5,3 +5,12 @@ export const login = (body) =>
 
 export const register = (body) =>
     api.post("auth/register", body);
+
+export const logout = () =>
+    api.post("auth/logout");
+
+export const refreshToken = () =>
+    api.get("auth/refresh");
+
+export const accesstoken = () =>
+    api.get("auth/accesstoken");
