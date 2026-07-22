@@ -1,5 +1,6 @@
 import {api} from "../api/axios";
 
+// All the post
 export const login = (body) =>
     api.post("auth/login", body);
 
@@ -9,8 +10,13 @@ export const register = (body) =>
 export const logout = () =>
     api.post("auth/logout");
 
+// All the get
 export const refreshToken = () =>
     api.get("auth/refresh");
 
 export const accesstoken = () =>
     api.get("auth/accesstoken");
+
+export const checkUsername=()=>{
+    api.get("auth/checkUsername");
+}

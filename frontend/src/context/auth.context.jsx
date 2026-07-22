@@ -1,32 +1,23 @@
-import {
-    useState,
-    createContext,
-    useEffect,
-    useMemo,
-} from "react";
+import { useState, createContext, useMemo } from "react";
 
+import { useAccessToken } from "../hooks/useAuth";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [User, setUser] = useState(null);
+  const [User, setUser] = useState(null);
+  const accessTokenQuery = useAccessToken();
 
+  const currentUser = User || accessTokenQuery.data?.data?.payloadtofrontend || null;
 
-
-    useEffect(() => {
-        console.log("Context User Updated:", User);
-    }, [User]);
-    const value = useMemo(
-        () => ({
-            User,
-            setUser,
-
-        }),
-        [User]
-    );
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
-
-}
+  const value = useMemo(
+    () => ({
+      User: currentUser,
+      setUser,
+      authLoading: accessTokenQuery.isLoading,
+      authError: accessTokenQuery.error,
+      authFetched: accessTokenQuery.isFetched,
+    }),
+    [currentUser, accessTokenQuery.isLoading, accessTokenQuery.error, accessTokenQuery.isFetched],
+  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
